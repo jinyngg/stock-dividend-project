@@ -9,11 +9,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class YahooFinanceScraper implements Scraper {
 
     // TODO 메모리, 가비지 컬렉션(GC) 개념을 공부하자!
@@ -89,7 +91,7 @@ public class YahooFinanceScraper implements Scraper {
 //                System.out.println(year + "/" + month + "/" + day + "->" + dividend);
             }
 
-            scarpResult.setDividendEntities(dividends);
+            scarpResult.setDividends(dividends);
 
         } catch (Exception e) {
             // TODO
