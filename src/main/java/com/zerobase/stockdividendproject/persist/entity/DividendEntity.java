@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "DIVIDEND")
 @Table(
         uniqueConstraints = {
                 @UniqueConstraint(
