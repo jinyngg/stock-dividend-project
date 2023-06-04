@@ -8,7 +8,9 @@ import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
 import com.zerobase.stockdividendproject.persist.entity.DividendEntity;
 import com.zerobase.stockdividendproject.scraper.Scraper;
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CompanyService {
+
+    private final Trie trie;
 
     private final Scraper yahooFinenceScraper;
     private final CompanyRepository companyRepository;
@@ -57,5 +61,29 @@ public class CompanyService {
 
         this.dividendRepository.saveAll(dividendEntities);
         return company;
+    }
+
+    public List<String> getCompanyNameByKeyword(String keyword) {
+        Pageable limit = PageRequest.of(0, 10);
+        Page<CompanyEntity> companyEntities = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
+        return companyEntities.stream()
+                .map(companyEntity -> companyEntity.getName())
+                .collect(Collectors.toList());
+    }
+
+    public void addAutocompleteKeyword(String keyword){
+        // trie는 key, value를 같이 저장할 수 있으나 자동완성 기능만 구현하기 위해 value는 null 입력
+        this.trie.put(keyword, null);
+    }
+
+    public List<String> autocomplete(String Keyword) {
+        return (List<String>) this.trie.prefixMap(Keyword).keySet()
+                .stream()
+//                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteAutocompleteKeyword(String keyword) {
+        this.trie.remove(keyword);
     }
 }
