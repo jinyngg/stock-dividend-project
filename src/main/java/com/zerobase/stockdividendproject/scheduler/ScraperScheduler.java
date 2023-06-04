@@ -2,6 +2,7 @@ package com.zerobase.stockdividendproject.scheduler;
 
 import com.zerobase.stockdividendproject.model.Company;
 import com.zerobase.stockdividendproject.model.ScrapedResult;
+import com.zerobase.stockdividendproject.model.constants.CacheKey;
 import com.zerobase.stockdividendproject.persist.CompanyRepository;
 import com.zerobase.stockdividendproject.persist.DividendRepository;
 import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
@@ -9,12 +10,17 @@ import com.zerobase.stockdividendproject.persist.entity.DividendEntity;
 import com.zerobase.stockdividendproject.scraper.YahooFinanceScraper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+// 스케쥴러가 돌아갈 때마다 cache 데이터가 비워지며, 배당금을 조회할 때 캐시가 올라간다.
 @Slf4j
 @Component
+@EnableCaching
 @AllArgsConstructor
 public class ScraperScheduler {
 
@@ -23,7 +29,9 @@ public class ScraperScheduler {
     private final DividendRepository dividendRepository;
 
     // cron => config 설정으로 관리하는게 좋다. 서버 배포를 다시하지 않아도 설정값만 바꿔서 재실행해주면 된다.
-//    @Scheduled(cron = "${scheduler.scrap.yahoo}")
+    // allEntries = true finance에 해당하는 cache 전부 제거
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
+    @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling() {
 
         log.info("Scraping scheduler is started");

@@ -3,6 +3,7 @@ package com.zerobase.stockdividendproject.service;
 import com.zerobase.stockdividendproject.model.Company;
 import com.zerobase.stockdividendproject.model.Dividend;
 import com.zerobase.stockdividendproject.model.ScrapedResult;
+import com.zerobase.stockdividendproject.model.constants.CacheKey;
 import com.zerobase.stockdividendproject.persist.CompanyRepository;
 import com.zerobase.stockdividendproject.persist.DividendRepository;
 import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
@@ -24,7 +25,7 @@ public class FinanceService {
     private final DividendRepository dividendRepository;
 
     // key =>
-    @Cacheable(key = "#companyName", value = "finance")
+    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult getDividendByCompanyName(String companyName) {
         
         // Redis에서 가져오는 데이터인지 확인하기 위해 로그 작성
