@@ -8,12 +8,14 @@ import com.zerobase.stockdividendproject.persist.DividendRepository;
 import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
 import com.zerobase.stockdividendproject.persist.entity.DividendEntity;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FinanceService {
@@ -24,6 +26,9 @@ public class FinanceService {
     // key =>
     @Cacheable(key = "#companyName", value = "finance")
     public ScrapedResult getDividendByCompanyName(String companyName) {
+        
+        // Redis에서 가져오는 데이터인지 확인하기 위해 로그 작성
+        log.info("Search company -> " + companyName);
         
         // 회사명을 기준으로 회사 정보를 조회
         CompanyEntity company = this.companyRepository.findByName(companyName)
