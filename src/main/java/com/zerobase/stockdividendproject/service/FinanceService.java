@@ -8,6 +8,7 @@ import com.zerobase.stockdividendproject.persist.DividendRepository;
 import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
 import com.zerobase.stockdividendproject.persist.entity.DividendEntity;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
+    // key =>
+    @Cacheable(key = "#companyName", value = "finance")
     public ScrapedResult getDividendByCompanyName(String companyName) {
         
         // 회사명을 기준으로 회사 정보를 조회
@@ -31,16 +34,20 @@ public class FinanceService {
 
         // 결과 조합 후 반환
         List<Dividend> dividends = dividendEntities.stream()
-                .map(dividendEntity -> Dividend.builder()
-                        .date(dividendEntity.getDate())
-                        .dividend(dividendEntity.getDividend())
-                        .build())
+                .map(dividendEntity -> new Dividend(dividendEntity.getDate(), dividendEntity.getDividend())
+//                        Dividend.builder()
+//                        .date(dividendEntity.getDate())
+//                        .dividend(dividendEntity.getDividend())
+//                        .build()
+                        )
                 .collect(Collectors.toList());
 
-        return new ScrapedResult(Company.builder()
-                .ticker(company.getTicker())
-                .name(company.getName())
-                .build(), dividends
+        return new ScrapedResult(new Company(company.getTicker(), company.getName())
+//                Company.builder()
+//                .ticker(company.getTicker())
+//                .name(company.getName())
+//                .build()
+                , dividends
         );
     }
 }

@@ -18,10 +18,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 public class CacheConfig {
 
-    @Value("${spring.redis.host}}")
+    @Value("${spring.redis.host}")
     private String host;
 
-    @Value("${spring.redis.host}")
+    @Value("${spring.redis.port}")
     private int port;
 
     // Serialization(직렬화) => 데이터 or 오브젝트와 같은 값들을 바이트 형태로 변환
