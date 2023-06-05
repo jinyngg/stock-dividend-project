@@ -65,13 +65,14 @@ public class TokenProvider {
 
     public boolean validateToken(String token) {
         // 토큰이 빈 값이면 유효하지 않음.
-        if (!StringUtils.hasText(token)) {
+        if (!StringUtils.hasText(token)){
             return false;
         }
+
         var claims = this.parseClaims(token);
 
         // 토큰 만료시간에 현재 시간을 비교하여 유효한지 확인
-        return claims.getExpiration().before(new Date());
+        return !claims.getExpiration().before(new Date());
     }
 
     private Claims parseClaims(String token) {
