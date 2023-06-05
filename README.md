@@ -48,6 +48,9 @@
 
 ![회사_정보_추가](https://github.com/jinyngg/stock-dividend-project/assets/96164211/7037cfa5-bc43-40a5-9507-43e5b14d46c2)
 
+````공통 에러 처리 추가````
+![image](https://github.com/jinyngg/stock-dividend-project/assets/96164211/7c9f165b-b361-436e-b3f2-eba09a22e470)
+
 ✅ ````DELETE```` - company/{ticker}
 - ticker 에 해당하는 회사 정보 삭제
 - 삭제시 회사의 배당금 정보와 캐시도 모두 삭제되어야 함 ````Redis````
