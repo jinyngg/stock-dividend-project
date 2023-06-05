@@ -1,6 +1,6 @@
-package com.zerobase.stockdividendproject.persist.entity;
+package com.zerobase.stockdividendproject.entity;
 
-import com.zerobase.stockdividendproject.model.Company;
+import com.zerobase.stockdividendproject.model.CompanyDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Entity(name = "COMPANY")
-public class CompanyEntity {
+public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,9 @@ public class CompanyEntity {
 
     private String name;
 
-    public CompanyEntity(Company company) {
-        this.ticker = company.getTicker();
-        this.name = company.getName();
+    public Company(CompanyDto companyDto) {
+        this.ticker = companyDto.getTicker();
+        this.name = companyDto.getName();
     }
 
 }

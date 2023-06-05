@@ -1,6 +1,6 @@
-package com.zerobase.stockdividendproject.persist.entity;
+package com.zerobase.stockdividendproject.entity;
 
-import com.zerobase.stockdividendproject.model.Dividend;
+import com.zerobase.stockdividendproject.model.DividendDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
                 )
         }
 )
-public class DividendEntity {
+public class Dividend {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +31,10 @@ public class DividendEntity {
 
     private String dividend;
 
-    public DividendEntity(Long companyId, Dividend dividend) {
+    public Dividend(Long companyId, DividendDto dividendDto) {
         this.companyId = companyId;
-        this.date = dividend.getDate();
-        this.dividend = dividend.getDividend();
+        this.date = dividendDto.getDate();
+        this.dividend = dividendDto.getDividend();
     }
 
 }

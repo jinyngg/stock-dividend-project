@@ -1,4 +1,4 @@
-package com.zerobase.stockdividendproject.persist.entity;
+package com.zerobase.stockdividendproject.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity(name = "MEMBER")
 @Builder
-public class MemberEntity implements UserDetails {
+public class Member implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
