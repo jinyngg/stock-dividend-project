@@ -1,12 +1,12 @@
 package com.zerobase.stockdividendproject.scheduler;
 
-import com.zerobase.stockdividendproject.model.Company;
+import com.zerobase.stockdividendproject.model.CompanyDto;
 import com.zerobase.stockdividendproject.model.ScrapedResult;
-import com.zerobase.stockdividendproject.model.constants.CacheKey;
-import com.zerobase.stockdividendproject.persist.CompanyRepository;
-import com.zerobase.stockdividendproject.persist.DividendRepository;
-import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
-import com.zerobase.stockdividendproject.persist.entity.DividendEntity;
+import com.zerobase.stockdividendproject.Type.CacheKey;
+import com.zerobase.stockdividendproject.Repository.CompanyRepository;
+import com.zerobase.stockdividendproject.Repository.DividendRepository;
+import com.zerobase.stockdividendproject.entity.Company;
+import com.zerobase.stockdividendproject.entity.Dividend;
 import com.zerobase.stockdividendproject.scraper.YahooFinanceScraper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +37,13 @@ public class ScraperScheduler {
         log.info("Scraping scheduler is started");
         
         // 저장된 회사 목록을 조회
-        List<CompanyEntity> companies = this.companyRepository.findAll();
+        List<Company> companies = this.companyRepository.findAll();
 
         // 회사마다 배당금 정보를 새로 스크래핑
         for (var company : companies) {
             log.info("company -> " + company.getName());
             ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(
-                    new Company((company.getTicker()), (company.getName()))
+                    new CompanyDto((company.getTicker()), (company.getName()))
 //                    Company.builder()
 //                            .name(company.getName())
 //                            .ticker(company.getTicker())
@@ -53,13 +53,13 @@ public class ScraperScheduler {
             // 스크래핑만 대방금 정보 중 데이터베이스에 없는 값을 저장
             scrapedResult.getDividends().stream()
                     // 디비든 모델은 디비든 엔티티로 매핑
-                    .map(dividend -> new DividendEntity(company.getId(), dividend))
+                    .map(dividend -> new Dividend(company.getId(), dividend))
                     // 엘리멘트를 하나씩 디비든 레파지토리에 삽입
-                    .forEach(dividendEntity -> {
-                        boolean exists = dividendRepository.existsByCompanyIdAndDate(dividendEntity.getCompanyId(), dividendEntity.getDate());
+                    .forEach(dividend -> {
+                        boolean exists = dividendRepository.existsByCompanyIdAndDate(dividend.getCompanyId(), dividend.getDate());
                         if (!exists) {
-                            this.dividendRepository.save(dividendEntity);
-                            log.info("insert new dividend -> " + dividendEntity.toString());
+                            this.dividendRepository.save(dividend);
+                            log.info("insert new dividend -> " + dividend.toString());
                         }
                     });
 

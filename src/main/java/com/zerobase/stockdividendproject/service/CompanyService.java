@@ -1,14 +1,15 @@
 package com.zerobase.stockdividendproject.service;
 
-import com.zerobase.stockdividendproject.exception.impl.NoCompanyException;
-import com.zerobase.stockdividendproject.model.Company;
+import com.zerobase.stockdividendproject.Repository.CompanyRepository;
+import com.zerobase.stockdividendproject.Repository.DividendRepository;
+import com.zerobase.stockdividendproject.entity.Company;
+import com.zerobase.stockdividendproject.entity.Dividend;
+import com.zerobase.stockdividendproject.exception.StockDividendException;
+import com.zerobase.stockdividendproject.model.CompanyDto;
 import com.zerobase.stockdividendproject.model.ScrapedResult;
-import com.zerobase.stockdividendproject.persist.CompanyRepository;
-import com.zerobase.stockdividendproject.persist.DividendRepository;
-import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
-import com.zerobase.stockdividendproject.persist.entity.DividendEntity;
 import com.zerobase.stockdividendproject.scraper.Scraper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,9 @@ import org.springframework.util.ObjectUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.zerobase.stockdividendproject.Type.ErrorCode.*;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CompanyService {
@@ -29,44 +33,50 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
-    public Company save(String ticker) {
+    public CompanyDto save(String ticker) {
         // 회사 여부를 boolean 값으로 받아온다.
         boolean exists = this.companyRepository.existsByTicker(ticker);
         if (exists) {
-            throw new RuntimeException("already exists ticker -> " + ticker);
+//            throw new RuntimeException("already exists ticker -> " + ticker);
+
+            log.error("already exists ticker -> " + ticker);
+            throw new StockDividendException(TICKER_ALREADY_EXISTS);
         }
 
         return this.storeCompanyAndDividend(ticker);
     }
 
-    public Page<CompanyEntity> getAllCompany(Pageable pageable) {
+    public Page<Company> getAllCompany(Pageable pageable) {
         return this.companyRepository.findAll(pageable);
     }
 
-    private Company storeCompanyAndDividend(String ticker) {
+    private CompanyDto storeCompanyAndDividend(String ticker) {
 
         // ticker를 기준으로 회사를 스크래핑
-        Company company = this.yahooFinenceScraper.scrapCompanyByTicker(ticker);
-        if (ObjectUtils.isEmpty(company)) {
-            throw new RuntimeException("failed to scrap ticker -> " + ticker);
+        CompanyDto companyDto = this.yahooFinenceScraper.scrapCompanyByTicker(ticker);
+        if (ObjectUtils.isEmpty(companyDto)) {
+//            throw new RuntimeException("failed to scrap ticker -> " + ticker);
+
+            log.error("failed to scrap ticker -> " + ticker);
+            throw new StockDividendException(SCRAP_TICKER_NOT_FOUND);
         }
 
         // 해당 회사가 존재할 경우, 회사의 배당금 정보를 스크래핑
-        ScrapedResult scrapedResult = this.yahooFinenceScraper.scrap(company);
+        ScrapedResult scrapedResult = this.yahooFinenceScraper.scrap(companyDto);
 
         // 스크래핑 결과
-        CompanyEntity companyEntity = this.companyRepository.save(new CompanyEntity(company));
-        List<DividendEntity> dividendEntities = scrapedResult.getDividends().stream()
-                .map(dividend -> new DividendEntity(companyEntity.getId(), dividend))
+        Company company = this.companyRepository.save(new Company(companyDto));
+        List<Dividend> dividendEntities = scrapedResult.getDividends().stream()
+                .map(dividend -> new Dividend(company.getId(), dividend))
                 .collect(Collectors.toList());
 
         this.dividendRepository.saveAll(dividendEntities);
-        return company;
+        return companyDto;
     }
 
     public List<String> getCompanyNameByKeyword(String keyword) {
         Pageable limit = PageRequest.of(0, 10);
-        Page<CompanyEntity> companyEntities = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
+        Page<Company> companyEntities = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
         return companyEntities.stream()
                 .map(companyEntity -> companyEntity.getName())
                 .collect(Collectors.toList());
@@ -92,7 +102,7 @@ public class CompanyService {
 
         // 회사 정보 조회
         var company = this.companyRepository.findByTicker(ticker)
-                .orElseThrow(NoCompanyException::new);
+                .orElseThrow(() -> new StockDividendException(TICKER_NOT_FOUND));
 
         // 회사 정보 및 배당금 정보 삭제
         this.dividendRepository.findAllByCompanyId(company.getId());

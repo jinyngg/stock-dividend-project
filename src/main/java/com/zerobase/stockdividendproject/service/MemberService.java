@@ -1,9 +1,9 @@
 package com.zerobase.stockdividendproject.service;
 
-import com.zerobase.stockdividendproject.exception.impl.AlreadyExistUserException;
-import com.zerobase.stockdividendproject.model.Auth;
-import com.zerobase.stockdividendproject.persist.MemberRepository;
-import com.zerobase.stockdividendproject.persist.entity.MemberEntity;
+import com.zerobase.stockdividendproject.Repository.MemberRepository;
+import com.zerobase.stockdividendproject.entity.Member;
+import com.zerobase.stockdividendproject.exception.StockDividendException;
+import com.zerobase.stockdividendproject.model.AuthDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.zerobase.stockdividendproject.Type.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -26,10 +28,10 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("couldn't find user -> " + username));
     }
 
-    public MemberEntity register(Auth.SignUp member) {
+    public Member register(AuthDto.SignUp member) {
         boolean exists = this.memberRepository.existsByUsername(member.getUsername());
         if (exists) {
-            throw new AlreadyExistUserException();
+            throw new StockDividendException(USER_ALREADY_EXISTS);
         }
         
         // 사용자 정보 -> 암호화 (인코딩된 패스워드를 저장)
@@ -39,12 +41,14 @@ public class MemberService implements UserDetailsService {
         return result;
     }
 
-    public MemberEntity authenticate(Auth.SignIn member) {
+    public Member authenticate(AuthDto.SignIn member) {
         var user = this.memberRepository.findByUsername(member.getUsername())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 ID 입니다."));
+//                .orElseThrow(() -> new RuntimeException("존재하지 않는 ID 입니다."));
+                .orElseThrow(() -> new StockDividendException(ID_NOT_EXISTS));
 
         if (!this.passwordEncoder.matches(member.getPassword(), user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+//            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new StockDividendException(PASSWORD_NOT_MATCH);
         }
 
         return user;
