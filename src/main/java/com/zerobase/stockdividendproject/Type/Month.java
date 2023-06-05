@@ -1,4 +1,4 @@
-package com.zerobase.stockdividendproject.model.constants;
+package com.zerobase.stockdividendproject.Type;
 
 import lombok.AllArgsConstructor;
 

@@ -1,4 +1,4 @@
-package com.zerobase.stockdividendproject.model.constants;
+package com.zerobase.stockdividendproject.Type;
 
 public class CacheKey {
 
