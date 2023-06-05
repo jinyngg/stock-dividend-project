@@ -16,6 +16,8 @@ public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
     // Optional 감싸는 이유 => NPE 방지, 값이 없는 경우도 코드적으로 깔끔히 정리 가능한 장점이 있음.
     Optional<CompanyEntity> findByName(String name);
 
+    Optional<CompanyEntity> findByTicker(String ticker);
+
     // IgnoreCase => 알파벳 소문자, 대문자 구분하지 않음
     Page<CompanyEntity> findByNameStartingWithIgnoreCase(String s, Pageable limit);
 
