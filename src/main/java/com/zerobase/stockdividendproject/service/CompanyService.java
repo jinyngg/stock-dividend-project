@@ -1,5 +1,6 @@
 package com.zerobase.stockdividendproject.service;
 
+import com.zerobase.stockdividendproject.exception.impl.NoCompanyException;
 import com.zerobase.stockdividendproject.model.Company;
 import com.zerobase.stockdividendproject.model.ScrapedResult;
 import com.zerobase.stockdividendproject.persist.CompanyRepository;
@@ -91,7 +92,7 @@ public class CompanyService {
 
         // 회사 정보 조회
         var company = this.companyRepository.findByTicker(ticker)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다."));
+                .orElseThrow(NoCompanyException::new);
 
         // 회사 정보 및 배당금 정보 삭제
         this.dividendRepository.findAllByCompanyId(company.getId());

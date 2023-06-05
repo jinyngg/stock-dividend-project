@@ -1,5 +1,6 @@
 package com.zerobase.stockdividendproject.service;
 
+import com.zerobase.stockdividendproject.exception.impl.AlreadyExistUserException;
 import com.zerobase.stockdividendproject.model.Auth;
 import com.zerobase.stockdividendproject.persist.MemberRepository;
 import com.zerobase.stockdividendproject.persist.entity.MemberEntity;
@@ -28,7 +29,7 @@ public class MemberService implements UserDetailsService {
     public MemberEntity register(Auth.SignUp member) {
         boolean exists = this.memberRepository.existsByUsername(member.getUsername());
         if (exists) {
-            throw new RuntimeException("이미 사용 중인 아이디입니다.");
+            throw new AlreadyExistUserException();
         }
         
         // 사용자 정보 -> 암호화 (인코딩된 패스워드를 저장)
