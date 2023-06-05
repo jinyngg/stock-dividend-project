@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Company {
+public class CompanyDto {
 
     /*
     Entity, Model을 따로 생성하는 이유

@@ -10,9 +10,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ScrapedResult {
 
-    private Company company;
+    private CompanyDto companyDto;
 
-    private List<Dividend> dividends;
+    private List<DividendDto> dividends;
 
     public ScrapedResult() {
         this.dividends = new ArrayList<>();
