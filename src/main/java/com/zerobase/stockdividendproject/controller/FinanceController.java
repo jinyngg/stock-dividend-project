@@ -1,4 +1,4 @@
-package com.zerobase.stockdividendproject.web;
+package com.zerobase.stockdividendproject.controller;
 
 import com.zerobase.stockdividendproject.model.ScrapedResult;
 import com.zerobase.stockdividendproject.service.FinanceService;

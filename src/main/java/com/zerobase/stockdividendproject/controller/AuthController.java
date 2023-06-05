@@ -1,6 +1,6 @@
-package com.zerobase.stockdividendproject.web;
+package com.zerobase.stockdividendproject.controller;
 
-import com.zerobase.stockdividendproject.model.Auth;
+import com.zerobase.stockdividendproject.model.AuthDto;
 import com.zerobase.stockdividendproject.security.TokenProvider;
 import com.zerobase.stockdividendproject.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,13 @@ public class AuthController {
     private final TokenProvider tokenProvider;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody Auth.SignUp request) {
+    public ResponseEntity<?> signup(@RequestBody AuthDto.SignUp request) {
         var result = this.memberService.register(request);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody Auth.SignIn request) {
+    public ResponseEntity<?> signin(@RequestBody AuthDto.SignIn request) {
         var member = this.memberService.authenticate(request);
         var token = this.tokenProvider.generateToken(member.getUsername(), member.getRoles());
         log.info("user login -> " + request.getUsername());

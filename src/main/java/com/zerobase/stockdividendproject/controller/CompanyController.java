@@ -1,10 +1,12 @@
-package com.zerobase.stockdividendproject.web;
+package com.zerobase.stockdividendproject.controller;
 
-import com.zerobase.stockdividendproject.model.Company;
-import com.zerobase.stockdividendproject.model.constants.CacheKey;
-import com.zerobase.stockdividendproject.persist.entity.CompanyEntity;
+import com.zerobase.stockdividendproject.exception.StockDividendException;
+import com.zerobase.stockdividendproject.model.CompanyDto;
+import com.zerobase.stockdividendproject.Type.CacheKey;
+import com.zerobase.stockdividendproject.entity.Company;
 import com.zerobase.stockdividendproject.service.CompanyService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import static com.zerobase.stockdividendproject.Type.ErrorCode.TICKER_NOT_FOUND;
+
+@Slf4j
 @RestController
 @RequestMapping("/company")
 @AllArgsConstructor
@@ -37,7 +42,7 @@ public class CompanyController {
     @GetMapping
     @PreAuthorize("hasRole('READ')")
     public ResponseEntity<?> searchCompany(final Pageable pageable) {
-        Page<CompanyEntity> companies = this.companyService.getAllCompany(pageable);
+        Page<Company> companies = this.companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
     }
 
@@ -48,16 +53,19 @@ public class CompanyController {
      */
     @PostMapping
     @PreAuthorize("hasRole('WRITE')") // 쓰기 권한이 있는 유저만 API 호출 가능
-    public ResponseEntity<?> addCompany(@RequestBody Company request) {
+    public ResponseEntity<?> addCompany(@RequestBody CompanyDto request) {
         String ticker = request.getTicker().trim();
         if (ObjectUtils.isEmpty(ticker)) {
-            throw new RuntimeException("ticker is empty");
+//            throw new RuntimeException("ticker is empty");
+
+            log.error("ticker is empty");
+            throw new StockDividendException(TICKER_NOT_FOUND);
         }
 
-        Company company = this.companyService.save(ticker);
-        this.companyService.addAutocompleteKeyword(company.getName());
+        CompanyDto companyDto = this.companyService.save(ticker);
+        this.companyService.addAutocompleteKeyword(companyDto.getName());
 
-        return ResponseEntity.ok(company);
+        return ResponseEntity.ok(companyDto);
     }
 
     @DeleteMapping("/{ticker}")
