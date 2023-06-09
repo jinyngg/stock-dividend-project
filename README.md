@@ -90,4 +90,8 @@ dependencies {
 
 ![image](https://github.com/jinyngg/stock-dividend-project/assets/96164211/d8012e3e-db57-4000-a9fa-05a3218166e6)
 
+# 피드백(23.06.08)
+
+
+
 ````김하은```` 강사님 강의를 듣고 진행한 프로젝트입니다. 👨‍🎓
